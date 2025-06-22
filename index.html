@@ -45,6 +45,7 @@
       background-color: #007bff;
       color: white;
       margin-bottom: 15px;
+      margin-right: 5px;
     }
     button:hover {
       background-color: #0056b3;
@@ -56,6 +57,9 @@
       padding: 15px;
       margin-top: 20px;
       border-radius: 5px;
+    }
+    .checkbox {
+      margin-bottom: 10px;
     }
     @media (max-width: 600px) {
       body {
@@ -80,23 +84,43 @@
   <label for="data">Data:</label>
   <input type="date" id="data">
 
+  <div class="checkbox"><input type="checkbox" id="incluirOrientacoes" checked> Incluir Orientações Padrões</div>
+  <label for="orientacoes">Orientações Padrões:</label>
+  <textarea id="orientacoes" rows="6">1. As atividades de casa deverão ser feitas no caderno indicando as questões correspondentes.
+2. Ao término das atividades, postar a foto do caderno aqui nessa postagem.
+3. Qualquer dúvida, basta escrever no comentário do mural.
+4. Atualize a página (aperte F5) após a postagem e verifique se a sua atividade foi enviada.
+
+Bons estudos!</textarea>
+
+  <div class="checkbox"><input type="checkbox" id="incluirPreRequisitos" checked> Incluir Pré-requisitos</div>
+  <label for="prerequisitos">Pré-requisitos:</label>
+  <textarea id="prerequisitos" rows="3"></textarea>
+
+  <div class="checkbox"><input type="checkbox" id="incluirObjetivos" checked> Incluir Objetivos de Aprendizagem</div>
   <label for="objetivos">Objetivos de Aprendizagem (adicione um por linha):</label>
   <textarea id="objetivos" rows="6"></textarea>
 
+  <div class="checkbox"><input type="checkbox" id="incluirAula" checked> Incluir "Em Aula"</div>
   <label for="qtdTempos">Quantidade de tempos:</label>
   <input type="number" id="qtdTempos" min="1" value="2" onchange="gerarTempos()">
 
   <div id="tempos"></div>
 
+  <div class="checkbox"><input type="checkbox" id="incluirCasa" checked> Incluir "Em Casa"</div>
   <label for="dever">Dever de casa (texto):</label>
   <textarea id="dever" rows="3"></textarea>
 
   <button onclick="gerarPlanejamento()">Gerar Planejamento</button>
-  <button onclick="copiarTexto()">Copiar Texto</button>
+  <button onclick="copiarTitulo()">Copiar Título</button>
+  <button onclick="copiarTexto()">Copiar Resto</button>
 
   <div id="resultado"></div>
 
   <script>
+    let tituloGerado = "";
+    let textoGerado = "";
+
     function gerarTempos() {
       const qtd = document.getElementById("qtdTempos").value;
       const container = document.getElementById("tempos");
@@ -115,48 +139,53 @@
       const modulo = document.getElementById("modulo").value;
       const titulo = document.getElementById("titulo").value;
       const data = new Date(document.getElementById("data").value).toLocaleDateString('pt-BR');
+      const incluirPreRequisitos = document.getElementById("incluirPreRequisitos").checked;
+      const incluirOrientacoes = document.getElementById("incluirOrientacoes").checked;
+      const incluirObjetivos = document.getElementById("incluirObjetivos").checked;
+      const incluirAula = document.getElementById("incluirAula").checked;
+      const incluirCasa = document.getElementById("incluirCasa").checked;
+      const prerequisitos = document.getElementById("prerequisitos").value.trim();
+      const orientacoes = document.getElementById("orientacoes").value.trim();
       const objetivos = document.getElementById("objetivos").value.trim().split("\n").map((o, i) => `• ${o}`).join("\n");
       const qtdTempos = document.getElementById("qtdTempos").value;
+
       let conteudos = "";
       for (let i = 1; i <= qtdTempos; i++) {
         conteudos += `\n${i}º Tempo - ${document.getElementById("tempo" + i).value}`;
       }
       const dever = document.getElementById("dever").value;
 
-      const texto = `Módulo ${modulo} - ${titulo} - ${data}
+      tituloGerado = `Módulo ${modulo} - ${titulo} - ${data}`;
 
-------------------------------
-ORIENTAÇÕES PADRÕES
-------------------------------
-1. As atividades de casa deverão ser feitas no caderno indicando as questões correspondentes.
-2. Ao término das atividades, postar a foto do caderno aqui nessa postagem.
-3. Qualquer dúvida, basta escrever no comentário do mural.
-4. Atualize a página (aperte F5) após a postagem e verifique se a sua atividade foi enviada.
+      textoGerado = "";
+      if (incluirOrientacoes) {
+        textoGerado += `\n\n------------------------------\nORIENTAÇÕES PADRÕES\n------------------------------\n${orientacoes}`;
+      }
+      if (incluirPreRequisitos) {
+        textoGerado += `\n\n------------------------------\nPRÉ-REQUISITOS\n------------------------------\n${prerequisitos}`;
+      }
+      if (incluirObjetivos) {
+        textoGerado += `\n\n------------------------------\nOBJETIVOS DE APRENDIZAGEM\n------------------------------\n\n1.\n${objetivos}`;
+      }
+      if (incluirAula) {
+        textoGerado += `\n\n------------------------------\nEM AULA\n------------------------------${conteudos}`;
+      }
+      if (incluirCasa) {
+        textoGerado += `\n\n------------------------------\nEM CASA\n------------------------------\n1. ${dever}`;
+      }
 
-Bons estudos!
+      document.getElementById("resultado").innerText = tituloGerado + textoGerado;
+    }
 
-------------------------------
-OBJETIVOS DE APRENDIZAGEM
-------------------------------
-
-1.\n${objetivos}
-
-------------------------------
-EM AULA
-------------------------------${conteudos}
-
-------------------------------
-EM CASA
-------------------------------
-1. ${dever}`;
-
-      document.getElementById("resultado").innerText = texto;
+    function copiarTitulo() {
+      navigator.clipboard.writeText(tituloGerado).then(() => {
+        alert("Título copiado!");
+      });
     }
 
     function copiarTexto() {
-      const texto = document.getElementById("resultado").innerText;
-      navigator.clipboard.writeText(texto).then(() => {
-        alert("Texto copiado para a área de transferência!");
+      navigator.clipboard.writeText(textoGerado).then(() => {
+        alert("Texto do planejamento copiado!");
       });
     }
 
