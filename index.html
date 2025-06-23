@@ -138,7 +138,8 @@ Bons estudos!</textarea>
     function gerarPlanejamento() {
       const modulo = document.getElementById("modulo").value;
       const titulo = document.getElementById("titulo").value;
-      const data = new Date(document.getElementById("data").value).toLocaleDateString('pt-BR');
+      const dataInput = document.getElementById("data").value;
+      const data = dataInput.split("-").reverse().join("/");
       const incluirPreRequisitos = document.getElementById("incluirPreRequisitos").checked;
       const incluirOrientacoes = document.getElementById("incluirOrientacoes").checked;
       const incluirObjetivos = document.getElementById("incluirObjetivos").checked;
